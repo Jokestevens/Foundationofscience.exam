@@ -1,47 +1,41 @@
-<<<<<<< HEAD
 from flask import Flask, render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///aaldb.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///bookdb.db'
 
 db = SQLAlchemy(app)
 
-class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True)  # Corrected syntax error
-    firstname = db.Column(db.String(50), nullable=False)
-    lastname = db.Column(db.String(50), nullable=False)
-    email = db.Column(db.String(150), nullable=False)
-    role = db.Column(db.String(50), nullable=False)
+class Book(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(100), nullable=False)
+    author = db.Column(db.String(100), nullable=False)
+    publication_year = db.Column(db.Integer, nullable=False)
 
 def create_db():
     with app.app_context():
         db.create_all()
 
-@app.route('/')
-def index():
-    users = User.query.all()
-    return render_template('index.html', users=users)
+@app.route('/books')
+def list_books():
+    books = Book.query.all()
+    return render_template('list_books.html', books=books)
 
-@app.route('/add-user', methods=['GET', 'POST'])
-def add_user():
+@app.route('/add_book', methods=['GET', 'POST'])
+def add_book():
     if request.method == 'POST':
-        firstname = request.form['firstname']
-        lastname = request.form['lastname']
-        email = request.form['email']
-        role = request.form['role']
+        title = request.form['title']
+        author = request.form['author']
+        publication_year = request.form['publication_year']
 
-        new_user = User(firstname=firstname, lastname=lastname, email=email, role=role)
-        db.session.add(new_user)
-        db.session.commit()  # Corrected typo (deb -> db)
-        return redirect(url_for('index'))
-    return render_template('add-user.html', title='Add a User')
+        new_book = Book(title=title, author=author, publication_year=publication_year)
+        db.session.add(new_book)
+        db.session.commit()
+        return redirect(url_for('list_books'))
+
+    return render_template('add_book.html', title='Add a Book')
 
 if __name__ == '__main__':
     create_db()
-    app.run(port=5001, debug=True)
-
-
-=======
->>>>>>> origin/master
+    app.run(port=5002, debug=True)
 
